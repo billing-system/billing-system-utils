@@ -5,7 +5,6 @@ import external.api.Processor;
 import external.api.TransactionDirection;
 import logger.BillingSystemLogger;
 
-import java.math.BigDecimal;
 import java.util.logging.Level;
 
 public class ProcessorWrapper {
@@ -29,7 +28,7 @@ public class ProcessorWrapper {
 
     public String performTransaction(String srcBankAccount,
                                      String dstBankAccount,
-                                     BigDecimal amount,
+                                     double amount,
                                      TransactionDirection direction) throws ProcessorException {
         try {
             return tryPerformingTransaction(srcBankAccount, dstBankAccount, amount, direction);
@@ -50,7 +49,7 @@ public class ProcessorWrapper {
 
     private String tryPerformingTransaction(String srcBankAccount,
                                             String dstBankAccount,
-                                            BigDecimal amount,
+                                            double amount,
                                             TransactionDirection direction) throws Exception {
         String transactionId = processor.performTransaction(srcBankAccount, dstBankAccount, amount, direction);
 

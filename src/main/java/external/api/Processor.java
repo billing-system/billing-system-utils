@@ -13,7 +13,7 @@ public class Processor {
 
     public String performTransaction(String srcBankAccount,
                                      String dstBankAccount,
-                                     BigDecimal amount,
+                                     double amount,
                                      TransactionDirection direction) throws Exception {
         return UUID.randomUUID().toString();
     }
