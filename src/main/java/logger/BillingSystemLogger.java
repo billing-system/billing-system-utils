@@ -14,7 +14,7 @@ public class BillingSystemLogger {
         logger = Logger.getLogger(BillingSystemLogger.class.getName());
     }
 
-    public void log(Level logLevel, String message) {
+    public synchronized void log(Level logLevel, String message) {
         logger.log(logLevel, message);
     }
 }
