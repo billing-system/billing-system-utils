@@ -1,1 +1,1 @@
-# billing-system-utils
+Library that contains code shared between different services
