@@ -13,10 +13,6 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<BillingTransaction, String> {
 
-    @Query("SELECT t FROM Transaction t WHERE t.transactionDirection = 'CREDIT' AND " +
-            "t.transactionStatus IN ('WAITING_TO_BE_SENT', 'FAILURE')")
-    List<BillingTransaction> findTransactionsInStatusesWaitingToBeSentOrFailure();
-
 
     @Query("SELECT t FROM Transaction t WHERE t.transactionStatus = 'SUCCESS' AND t.dstBankAccount IN " +
             "(SELECT t2.dstBankAccount FROM Transaction t2 WHERE t2.transactionDirection = 'CREDIT') " +
@@ -25,12 +21,15 @@ public interface TransactionRepository extends JpaRepository<BillingTransaction,
     List<BillingTransaction> findTransactionsForAdvancesWithoutRepaymentPlan();
 
 
-    @Query("SELECT t FROM Transaction t WHERE t.transactionId IN :ids")
-    List<BillingTransaction> findByIdIn(@Param("ids") List<String> ids);
+    @Query("SELECT t FROM Transaction t WHERE t.transactionStatus = :transactionStatus")
+    List<BillingTransaction> findByTransactionStatus(@Param("transactionStatus")
+                                                             DbTransactionStatus transactionStatus);
 
 
-    @Query("SELECT t FROM Transaction t WHERE t.dstBankAccount IN :dstBankAccounts")
-    List<BillingTransaction> findByDstBankAccountIn(@Param("dstBankAccounts") List<String> dstBankAccounts);
+    @Query("SELECT t FROM Transaction t WHERE t.dstBankAccount = :dstBankAccount AND " +
+            "t.transactionDirection = 'DEBIT' ORDER BY t.transactionTime")
+    List<BillingTransaction> findDebitTransactionsByDstBankAccountOrderByTransactionTime(@Param("dstBankAccount")
+                                                                                                 String dstBankAccount);
 
 
     @Query("SELECT t.dstBankAccount FROM Transaction t WHERE t.transactionDirection = 'DEBIT' AND " +
@@ -38,10 +37,8 @@ public interface TransactionRepository extends JpaRepository<BillingTransaction,
     List<String> findBankAccountsThatFinishedPayingDebits(@Param("numberOfDebits") int numberOfDebits);
 
 
-    @Query("SELECT t FROM Transaction t WHERE t.dstBankAccount = :dstBankAccount AND " +
-            "t.transactionDirection = 'DEBIT' ORDER BY t.transactionTime")
-    List<BillingTransaction> findDebitTransactionsByDstBankAccountOrderByTransactionTime(@Param("dstBankAccount")
-                                                                                                 String dstBankAccount);
+    @Query("SELECT t FROM Transaction t WHERE t.dstBankAccount IN :dstBankAccounts")
+    List<BillingTransaction> findByDstBankAccountIn(@Param("dstBankAccounts") List<String> dstBankAccounts);
 
 
     @Query("SELECT t FROM Transaction t WHERE t.transactionStatus = :transactionStatus AND " +
@@ -58,4 +55,11 @@ public interface TransactionRepository extends JpaRepository<BillingTransaction,
                                                                               String dstBankAccount,
                                                                       @Param("transactionDirection")
                                                                               TransactionDirection transactionDirection);
+
+
+    @Query("SELECT t FROM Transaction t WHERE t.transactionStatus = :transactionStatus AND t.transactionId IN :ids")
+    List<BillingTransaction> findByTransactionStatusAndIdIn(@Param("transactionStatus")
+                                                                    DbTransactionStatus transactionStatus,
+                                                            @Param("ids")
+                                                                    List<String> ids);
 }
